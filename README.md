@@ -10,6 +10,8 @@
 
 ## General Information
 > This feed will run daily (need to add the script to the task schedule), and it will download the data about the tracks that you listened to during a day, and save that data in a SQLite database on your local machine. Before you can use this tool, you first need to declare your Deezer app in their developer portal: https://developers.deezer.com/myapps/create. Create a new app with the following Redirect URL: http://localhost:8080/oauth/return this is necessary for the `deezer-oauth-cli` package to work.
+>INFO:
+>As deezer API data is limited to the last 100 songs. The script is scheduled to run daily at the beginning of the day and download the songs from the previous day. If you want to run the script at the end of the day, change the `DAYS_TO_FILTER to 0` variable.
 
 ## Technologies Used
 - Python 3.10
@@ -23,6 +25,9 @@
 - [x] *add LICENSE (MIT)*
 - [ ] *implement TRANSFORM*
 - [ ] *implement LOAD*
+
+## Job scheduling
+> To run a script automatically, you can create a batch file and add it to the Task Scheduler
 
 ## Acknowledgements
 - the project uses Deezer OAuth CLI from [Bruno Alla](https://github.com/browniebroke/deezer-oauth-cli)
