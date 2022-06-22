@@ -1,5 +1,5 @@
 # Deezer History ETL
-> Data pipeline using Deezer API. Download the data and save it in a SQLite database on local machine. 
+> Simple data pipeline using Deezer API. Download the data and save it in a SQLite database on local machine. 
 
 ## Table of Contents
 * [General Info](#general-information)
@@ -19,12 +19,13 @@
 *all used packages in pipfile*
 
 ## Project Status
-**Project is:** *in progress*
+**Project is:** *work on improvements*
 - [x] *implement EXTRACT*
 - [x] *add README*
 - [x] *add LICENSE (MIT)*
-- [ ] *implement TRANSFORM*
-- [ ] *implement LOAD*
+- [x] *implement TRANSFORM*
+- [x] *implement LOAD*
+- [ ] *tba...*
 
 ## Job scheduling
 > To run a script automatically, you can create a batch file and add it to the Task Scheduler
