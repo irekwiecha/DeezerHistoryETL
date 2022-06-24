@@ -13,6 +13,9 @@ APP_ID = app_id             # hard code your own id or create in private/__init_
 APP_KEY = app_secret_key    # hard code your own key or create in private/__init__.py
 DAYS_TO_FILTER = 1          # If you want to run the script at the end of the day set to 0
 
+# date declaration to the "filter"
+date_to_filter = (dt.now() - td(days=DAYS_TO_FILTER)).date()
+
 '''
 Before you can use this tool, you first need to declare your Deezer app in their developer portal:
 https://developers.deezer.com/myapps/create 
@@ -25,13 +28,13 @@ def get_token():
     # automatic process of create an API Token from deezer
     print('Authorize the token in the browser')
     print('\nA browser window will open for authorization...')
-    time.sleep(3)
+    time.sleep(1.5)
     os.system(f'deezer-oauth {APP_ID} {APP_KEY}')
     print('Authorization token retrieved\n')
 
 
 def get_history(user_id, API_TOKEN):
-    # gets data from the generated address
+    # gets data from generated urls
     urls = [f'http://api.deezer.com/user/{user_id}/history?access_token={API_TOKEN}&index={index}' for index in [0, 50]]
     resp_data = []
     for url in urls:
@@ -48,10 +51,21 @@ def fill_dict(song_dict, resp_data):
     dif = ((dt.now() - dt.utcnow())) / td(hours=1)  # time difference in relation to UTC,
     for data in resp_data:
         for song in data['data']:
-            song_dict['song_name'].append(song['title'])
-            song_dict['artist_name'].append(song['artist']['name'])
-            song_dict['played_at'].append((dt.utcfromtimestamp(song['timestamp']) + td(hours=dif)).strftime("%d.%m.%y %H:%M:%S"))
-            song_dict['timestamp'].append(dt.utcfromtimestamp(song['timestamp']).strftime("%d.%m.%y"))
+            album_id = song['album']['id']
+            time = dt.utcfromtimestamp(song['timestamp']) + td(hours=dif)
+            if time.date() == date_to_filter:
+                song_dict['song_name'].append(song['title'])
+                song_dict['artist_name'].append(song['artist']['name'])
+                song_dict['timestamp'].append(time)
+                song_dict['date'].append(time.date())
+                try:
+                    r = requests.get(f'https://api.deezer.com/album/{album_id}')
+                    genres = r.json()
+                except requests.exceptions.RequestException as e:
+                    raise SystemExit(e)
+                song_dict['genre'].append(genres['genres']['data'][0]['name'])
+            else:
+                continue
 
 
 def validation_data(df):
@@ -60,7 +74,7 @@ def validation_data(df):
         print('No tracks downloaded. Finishing execution')
         return False
     # primary key check
-    if pd.Series(df['played_at']).is_unique:
+    if pd.Series(df['timestamp']).is_unique:
         pass
     else:
         raise Exception('Primary Key Check Failed')
@@ -76,8 +90,9 @@ def validation_data(df):
 song_dict = {
     "song_name": [],
     "artist_name": [],
-    "played_at": [],
-    "timestamp": []
+    "genre": [],
+    "timestamp": [],
+    "date": []
 }
 
 # call api_token & creat history data
@@ -94,13 +109,11 @@ except KeyError:
     history = get_history(user_id, api_token)
     fill_dict(song_dict, history)
 
-# date declaration to the "filter"
-date_to_filter = (dt.now() - td(days=DAYS_TO_FILTER)).strftime("%d.%m.%y")
-
 # creat a "filter" DataFrame
-song_df = pd.DataFrame(song_dict, columns=["song_name", "artist_name", "played_at", "timestamp"])
-filter_song_df = song_df["timestamp"] == date_to_filter
+song_df = pd.DataFrame(song_dict, columns=["song_name", "artist_name", "genre", "timestamp", "date"])
+filter_song_df = song_df["date"] == date_to_filter
 song_df = song_df.where(filter_song_df).dropna()
+
 
 # Validate
 
@@ -116,9 +129,10 @@ sql_query = """
 CREATE TABLE IF NOT EXISTS my_tracks(
     song_name VARCHAR(200),
     artist_name VARCHAR(200),
-    played_at VARCHAR(200),
-    timestamp VARCHAR(200),
-    CONSTRAINT primary_key_constraint PRIMARY KEY (played_at)
+    genre VARCHAR(200),
+    timestamp DATETIME,
+    date DATE,
+    CONSTRAINT primary_key_constraint PRIMARY KEY (timestamp)
 )
 """
 
@@ -132,6 +146,6 @@ except:
     print('Data already exists in the database')
 
 conn.close()
-print('...Close database\n')
+print('...Close database')
 
-# input('Press "ENTER" key to exit')
+# input('\nPress "ENTER" key to exit')
