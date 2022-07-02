@@ -53,7 +53,7 @@ def fill_dict(song_dict, resp_data):
         for song in data['data']:
             album_id = song['album']['id']
             time = dt.utcfromtimestamp(song['timestamp']) + td(hours=dif)
-            if time.date() == date_to_filter:
+            if time.date() == date_to_filter:  # only data for the selected day
                 song_dict['song_name'].append(song['title'])
                 song_dict['artist_name'].append(song['artist']['name'])
                 song_dict['timestamp'].append(time)
@@ -61,9 +61,11 @@ def fill_dict(song_dict, resp_data):
                 try:
                     r = requests.get(f'https://api.deezer.com/album/{album_id}')
                     genres = r.json()
+                    song_dict['genre'].append(genres['genres']['data'][0]['name'])
                 except requests.exceptions.RequestException as e:
                     raise SystemExit(e)
-                song_dict['genre'].append(genres['genres']['data'][0]['name'])
+                except IndexError:
+                    song_dict['genre'].append('n/a')
             else:
                 continue
 
@@ -109,10 +111,8 @@ except KeyError:
     history = get_history(user_id, api_token)
     fill_dict(song_dict, history)
 
-# creat a "filter" DataFrame
+# creat a DataFrame
 song_df = pd.DataFrame(song_dict, columns=["song_name", "artist_name", "genre", "timestamp", "date"])
-filter_song_df = song_df["date"] == date_to_filter
-song_df = song_df.where(filter_song_df).dropna()
 
 
 # Validate
