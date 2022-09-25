@@ -14,9 +14,18 @@ The generated database contains the following information:
 - Timestamp `YYYY-MM-DD hh:mm:ss`
 - Date `YYYY-MM-DD`
 
+For basic data analysis, run the `deezer_data_analyse.py`
+
+## Screenshots
+![Summary](https://i.imgur.com/uAxrAOn.png) 
+![Summary_by_Genre](https://i.imgur.com/5KklrX6.png) 
+![favorite genre](https://i.imgur.com/FIHLQOt.jpg)
+![distribution of songs during the day](https://i.imgur.com/W8Yk1vd.jpg) 
+![distribution of songs during the week](https://i.imgur.com/i3TgvHj.jpg)
+
 ## Tech Stack
 - Python 3.10
-- Packages to install: *requests, pandas, deezer-oauth-cli, python-dotenv*
+- Packages to install: *requests, pandas, deezer-oauth-cli, python-dotenv, matplotlib*
 
 ## Job scheduling
 To run a script automatically, you can create a batch file and add it to the Task Scheduler
