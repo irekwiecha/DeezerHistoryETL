@@ -97,7 +97,7 @@ song_dict = {
     "date": []
 }
 
-# call api_token & creat history data
+# call api_token & create history data
 api_token = os.getenv('API_TOKEN')
 history = get_history(user_id, api_token)
 
@@ -111,7 +111,7 @@ except KeyError:
     history = get_history(user_id, api_token)
     fill_dict(song_dict, history)
 
-# creat a DataFrame
+# create a DataFrame
 song_df = pd.DataFrame(song_dict, columns=["song_name", "artist_name", "genre", "timestamp", "date"])
 
 

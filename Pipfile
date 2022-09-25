@@ -8,6 +8,7 @@ requests = "*"
 pandas = "*"
 deezer-oauth-cli = "*"
 python-dotenv = "*"
+matplotlib = "*"
 
 [dev-packages]
 autopep8 = "*"
