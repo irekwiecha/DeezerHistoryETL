@@ -61,25 +61,27 @@ def fill_dict(song_dict, resp_data):
         for song in data["data"]:
             album_id = song["album"]["id"]
             time = dt.utcfromtimestamp(song["timestamp"]) + td(hours=dif)
-            if time.date() == date_to_filter:  # only the data from a given day
-                song_dict["song_name"].append(song["title"])
-                song_dict["artist_name"].append(song["artist"]["name"])
-                song_dict["timestamp"].append(time)
-                song_dict["date"].append(time.date())
-                try:
-                    r = requests.get(f"https://api.deezer.com/album/{album_id}")
-                    r.raise_for_status()
-                    genres = r.json()
-                    song_dict["genre"].append(genres["genres"]["data"][0]["name"])
-                except requests.exceptions.HTTPError as e:
-                    raise SystemExit(e)
-                except requests.exceptions.RequestException as e:
-                    raise SystemExit(e)
-                except IndexError:
-                    song_dict["genre"].append("n/a")
-            else:
+            
+            if time.date() != date_to_filter:
+                # Continue to the next iteration if the dates are different from the given day.
                 continue
 
+            # Only the data from a given day.
+            song_dict["song_name"].append(song["title"])
+            song_dict["artist_name"].append(song["artist"]["name"])
+            song_dict["timestamp"].append(time)
+            song_dict["date"].append(time.date())
+            try:
+                r = requests.get(f"https://api.deezer.com/album/{album_id}")
+                r.raise_for_status()
+                genres = r.json()
+                song_dict["genre"].append(genres["genres"]["data"][0]["name"])
+            except requests.exceptions.HTTPError as e:
+                raise SystemExit(e)
+            except requests.exceptions.RequestException as e:
+                raise SystemExit(e)
+            except IndexError:
+                song_dict["genre"].append("n/a")
 
 def validation_data(df):
     # check if DataFrame is empty
