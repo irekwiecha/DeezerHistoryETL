@@ -6,8 +6,9 @@ __pycache__/
 # Distribution / packaging
 private/
 to_schedule.bat
-# my_tracks.sqlite
+my_tracks.sqlite
 test.py
+to_schedule.bat
 /sample
 
 # pipenv
