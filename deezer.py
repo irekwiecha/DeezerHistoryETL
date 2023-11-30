@@ -36,7 +36,7 @@ def get_token():
 
 
 def get_history(user_id, API_TOKEN):
-    # retrieving data from from generated urls
+    # retrieving data from generated urls
     urls = [
         f"http://api.deezer.com/user/{user_id}/history?access_token={API_TOKEN}&index={index}"
         for index in [0, 50]
@@ -47,8 +47,6 @@ def get_history(user_id, API_TOKEN):
             r = requests.get(url)
             r.raise_for_status()
             resp_data.append(r.json())
-        except requests.exceptions.HTTPError as e:
-            raise SystemExit(e)
         except requests.exceptions.RequestException as e:
             raise SystemExit(e)
     return resp_data
@@ -61,7 +59,6 @@ def fill_dict(song_dict, resp_data):
         for song in data["data"]:
             album_id = song["album"]["id"]
             time = dt.utcfromtimestamp(song["timestamp"]) + td(hours=dif)
-            
             if time.date() != date_to_filter:
                 # Continue to the next iteration if the dates are different from the given day.
                 continue
